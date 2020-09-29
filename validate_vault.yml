@@ -7,7 +7,7 @@
     - token
     - metrics
     - audit
-    - nodes
+    - vault_server_count
     - ui
     - splunk
     - qualys
