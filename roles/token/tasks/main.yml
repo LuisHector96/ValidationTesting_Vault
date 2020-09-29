@@ -1,0 +1,8 @@
+# tasks file for roles/token
+- name: Check that v1/auth/token/lookup-self (GET) returns a status 200 and Check Issuer Token
+  uri:
+    url: "{{ vault.protocol }}://{{ vault.host }}/v1/auth/token/lookup-self"
+    method: GET
+    validate_certs: no
+    headers:
+      X-Vault-Token: "{{ vault.token_telemetry }}" 

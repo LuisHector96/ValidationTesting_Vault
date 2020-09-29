@@ -1,0 +1,22 @@
+- name: Validation Testing
+  hosts: remote
+  connection: local
+  roles:
+    - initialization
+    - seal
+    - token
+    - metrics
+    - audit
+    - nodes
+    - ui
+    - splunk
+    - qualys
+    - oracle_plugin
+  tags: backup
+
+#- name: Check that a page returns a status 200 and fail if the word AWESOME is not in the page contents
+#  uri:
+#    url: http://www.example.com
+#    return_content: yes
+#  register: this
+#  failed_when: "'AWESOME' not in this.content"

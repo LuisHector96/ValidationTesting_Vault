@@ -1,0 +1,12 @@
+# tasks file for roles/metrics
+- name: Check that v1/sys/metrics (GET) returns a status 200
+  uri:
+    url: "{{ vault.protocol }}://{{ vault.host }}/v1/sys/metrics"
+    method: GET
+    validate_certs: no
+    headers:
+        X-Vault-Token: "{{ vault.token_telemetry }}"
+
+- name: Current Vault metrics
+  debug:
+    msg: The current Vault Metrics is -> {{(response.content|from_json)}} <-

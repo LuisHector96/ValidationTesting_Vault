@@ -1,0 +1,32 @@
+---
+# tasks file for roles/nodes
+- name: Check ui endpoint
+  uri:
+    url: "{{ consul.protocol }}://{{ consul.host }}/ui"
+    method: GET
+    validate_certs: no
+    headers:
+        X-Consul-Token: "{{ consul.token }}"
+    return_content: yes
+    body_format: json
+  register: response
+  ignore_errors: yes
+  failed_when: "response.status == 200"
+  no_log: True
+
+- name: ui endpoint status
+  debug:
+    msg: "Consul UI is unreachable -> Request status: {{response.status}} <-"
+  when: "{{response.status != 200}}"
+
+- name: Check if Consul config has ui enabled
+  shell: grep -i 'ui' /etc/consul.d/consul.hcl | awk '{print $3}'
+  register: result
+
+- debug: 
+    msg: 
+      - "No ui Activated in Consul config."
+      - "Current ui value (if exists) = ->{{result.stdout}}<-"
+  when: 
+    (result.stdout == "") or
+    (result.stdout == "false")

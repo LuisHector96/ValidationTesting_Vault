@@ -1,0 +1,60 @@
+---
+# tasks file for roles/nodes
+- name: Check the number of consul and vault nodes
+  uri:
+    url: "{{ consul.protocol }}://{{ consul.host }}/v1/agent/members"
+    method: GET
+    validate_certs: no
+    headers:
+        X-Consul-Token: "{{ consul.token }}"
+    return_content: yes
+    body_format: json
+  register: vault_res
+  #failed_when: "(response.content|from_json)['initialized'] == false"
+
+
+# - set_fact: 
+#     dataresult: "{{ vault_res.content | from_json }}"
+
+- name: Vault Client Counter
+  debug:
+    msg: "The Number of Vault Servers is: -> {{ (vault_res.content | from_json) | json_query(jmesquery) | length }} <-"
+  vars:
+    jmesquery: "[? contains(Name, 'vault')]"
+
+- name: Check the number of consul and vault nodes
+  uri:
+    url: "{{ consul.protocol }}://{{ consul.host }}/v1/agent/self"
+    method: GET
+    validate_certs: no
+    headers:
+        X-Consul-Token: "{{ consul.token }}"
+    return_content: yes
+    body_format: json
+  register: consul_res
+
+- name: Consul Servers Counter
+  debug:
+    msg: "The Number of Consul Servers is: -> {{(consul_res.content | from_json)['Stats'].consul.known_servers}} <-"
+
+
+- name: Checking Leader is selected
+  uri:
+    url: "{{ consul.protocol }}://{{ consul.host }}/v1/status/leader"
+    method: GET
+    validate_certs: no
+    headers:
+        X-Consul-Token: "{{ consul.token }}"
+    return_content: yes
+    body_format: json
+  register: leader_res
+
+- name: Leader Status
+  debug:
+    msg: 
+      - "Leader was elected"
+      - "IP: {{leader_res.content}} "
+  when: 
+    (leader_res is failed) or
+    (leader_res != "")
+

@@ -1,0 +1,26 @@
+---
+# tasks file for roles/initialization
+- name: Check that v1/sys/init (GET) returns a status 200
+  uri:
+    url: "{{ vault.protocol }}://{{ vault.host }}/v1/sys/init"
+    method: GET
+    validate_certs: no
+    headers:
+        X-Vault-Token: "{{ vault.token_validator }}"
+
+- name: Check that v1/sys/init (GET) is set at true, Check init == true, fails on false
+  uri:
+    url: "{{ vault.protocol }}://{{ vault.host }}/v1/sys/init"
+    method: GET
+    validate_certs: no
+    headers:
+        X-Vault-Token: "{{ vault.token_validator }}"
+    return_content: yes
+    status_code: 200
+    body_format: json
+  register: response  
+  failed_when: "(response.content|from_json)['initialized'] == false"
+
+- name: Initialization value
+  debug:
+    msg: The value of the initialized variable is -> {{(response.content|from_json)['initialized']}} <-

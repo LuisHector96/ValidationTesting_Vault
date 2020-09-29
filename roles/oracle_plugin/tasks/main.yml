@@ -1,0 +1,20 @@
+---
+# tasks file for roles/splunk
+
+- name: Get stat of Oracle vault plugin
+  stat:
+    path: /opt/vault/plugins/vault-plugin-database-oracle #/path/to/file
+  register: st
+
+- debug:
+    msg: "Current Oracle Plugin Modified Date:  -> {{st.stat.mtime | float_to_date}} <-"
+  failed_when: st.stat.mtime != 1586276114.0
+  ignore_errors: yes
+
+- debug:
+    msg: "Oracle Plugin Version Confirmed: -> 0.2.1v <-"
+  when: st.stat.mtime == 1586276114.0
+
+- debug:
+    msg: "UPPER Version of Oracle Plugin"
+  when: st.stat.mtime != 1586276114.0

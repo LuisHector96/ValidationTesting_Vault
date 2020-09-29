@@ -1,0 +1,25 @@
+# tasks file for roles/audit
+- name: Check that v1/sys/audit (GET) returns a status 200
+  uri:
+    url: "{{ vault.protocol }}://{{ vault.host }}/v1/sys/audit"
+    method: GET
+    validate_certs: no
+    headers:
+        X-Vault-Token: "{{ vault.token_validator }}"
+
+- name: Check that v1/sys/audit (GET) contains audit paths        
+  uri:
+    url: "{{ vault.protocol }}://{{ vault.host }}/v1/sys/audit"
+    method: GET
+    validate_certs: no
+    headers:
+        X-Vault-Token: "{{ vault.token_validator }}"
+    return_content: yes
+    status_code: 200
+    body_format: json
+  register: response
+  failed_when: "  (response.content|from_json)['data']|length == 0"
+
+- name: Current Vault audit
+  debug:
+    msg: The current Audit Devices is -> {{(response.content|from_json)["data"]|length}} <-

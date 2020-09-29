@@ -1,0 +1,25 @@
+# tasks file for roles/seal
+- name: Check that v1/sys/seal-status (GET) returns a status 200
+  uri:
+    url: "{{ vault.protocol }}://{{ vault.host }}/v1/sys/seal-status"
+    method: GET
+    validate_certs: no
+    headers:
+        X-Vault-Token: "{{ vault.token_validator }}"
+
+- name: Check that v1/sys/seal-status (GET) is set at false, Check seal == false, fails on true
+  uri:
+    url: "{{ vault.protocol }}://{{ vault.host }}/v1/sys/seal-status"
+    method: GET
+    validate_certs: no
+    headers:
+        X-Vault-Token: "{{ vault.token_validator }}"
+    return_content: yes
+    status_code: 200
+    body_format: json
+  register: response  
+  failed_when: "(response.content|from_json)['sealed'] == true"
+
+- name: Initialization value
+  debug:
+    msg: The value of the initialized variable is -> {{(response.content|from_json)['sealed']}} <-
