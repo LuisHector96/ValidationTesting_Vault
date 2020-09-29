@@ -7,7 +7,7 @@
     headers:
         X-Vault-Token: "{{ vault.token_validator }}"
 
-- name: Check that v1/sys/audit (GET) contains audit paths        
+- name: Check that v1/sys/audit (GET) contains audit (enabled)     
   uri:
     url: "{{ vault.protocol }}://{{ vault.host }}/v1/sys/audit"
     method: GET
@@ -20,6 +20,10 @@
   register: response
   failed_when: "  (response.content|from_json)['data']|length == 0"
 
-- name: Current Vault audit
+- name: Current Number of Enabled Vault Audit Device
   debug:
-    msg: The current Audit Devices is -> {{(response.content|from_json)["data"]|length}} <-
+    msg: The current number of enabled audit devices is -> {{(response.content|from_json)["data"]|length}} <-
+    
+- name: Enabled Audit Device
+  debug:
+    msg: The current  enabled audit devices is -> {{(response.content|from_json)["data"]}} <-
