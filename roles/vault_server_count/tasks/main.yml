@@ -23,11 +23,11 @@
 
 - name: Checking Vault Leader is selected
   uri:
-    url: "{{ consul.protocol }}://{{ consul.host }}/v1/agent/self"
+    url: "{{ vault.protocol }}://{{ vault.host }}/v1/sys/leader"
     method: GET
     validate_certs: no
     headers:
-        X-Consul-Token: "{{ consul.token }}"
+        X-Consul-Token: "{{ vault.token }}"
     return_content: yes
     body_format: json
   register: vault_leader_res
