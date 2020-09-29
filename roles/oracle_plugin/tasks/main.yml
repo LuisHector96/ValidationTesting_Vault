@@ -3,7 +3,7 @@
 
 - name: Get stat of Oracle vault plugin
   stat:
-    path: /opt/vault/plugins/vault-plugin-database-oracle #/path/to/file
+    path: "{{ oracle_plugin_path }}" #/path/to/file
   register: st
 
 - debug:

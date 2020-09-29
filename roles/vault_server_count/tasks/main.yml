@@ -1,0 +1,80 @@
+---
+# tasks file for roles/nodes
+- name: Check the number of Vault Servers
+  uri:
+    url: "{{ consul.protocol }}://{{ consul.host }}/v1/agent/members"
+    method: GET
+    validate_certs: no
+    headers:
+        X-Consul-Token: "{{ consul.token }}"
+    return_content: yes
+    body_format: json
+  register: vault_res
+
+# - set_fact: 
+#     dataresult: "{{ vault_res.content | from_json }}"
+
+- name: Vault Server Counter
+  debug:
+    msg: "The Number of Vault Servers is: -> {{ (vault_res.content | from_json) | json_query(jmesquery) | length }} <-"
+  vars:
+    jmesquery: "[? contains(Name, 'vault')]"
+
+
+- name: Checking Vault Leader is selected
+  uri:
+    url: "{{ consul.protocol }}://{{ consul.host }}/v1/agent/self"
+    method: GET
+    validate_certs: no
+    headers:
+        X-Consul-Token: "{{ consul.token }}"
+    return_content: yes
+    body_format: json
+  register: vault_leader_res
+
+- name: Vault Leader Status
+  debug:
+    msg: 
+      - "Leader was elected"
+      - "{{(vault_leader_res.content | from_json)}} "
+  when: 
+    (vault_leader_res is failed) or
+    (vault_leader_res != "")
+
+
+- name: Check the number of Consul servers
+  uri:
+    url: "{{ consul.protocol }}://{{ consul.host }}/v1/agent/self"
+    method: GET
+    validate_certs: no
+    headers:
+        X-Consul-Token: "{{ consul.token }}"
+    return_content: yes
+    body_format: json
+  register: consul_res
+
+- name: Consul Servers Counter
+  debug:
+    msg: "The Number of Consul Servers is: -> {{(consul_res.content | from_json)['Stats'].consul.known_servers}} <-"
+
+
+- name: Checking Consul Leader is selected
+  uri:
+    url: "{{ consul.protocol }}://{{ consul.host }}/v1/status/leader"
+    method: GET
+    validate_certs: no
+    headers:
+        X-Consul-Token: "{{ consul.token }}"
+    return_content: yes
+    body_format: json
+  register: consul_leader_res
+
+- name: Consul Leader Status
+  debug:
+    msg: 
+      - "Leader was elected"
+      - "IP: {{(consul_leader_res.content | from_json)}} "
+  when: 
+    (consul_leader_res is failed) or
+    (consul_leader_res != "")
+

@@ -8,4 +8,5 @@ consul:
     token: ""
     host: "localhost:8500"
     protocol: "http"
-
+    
+oracle_plugin_path: "/opt/vault/plugins/vault-plugin-database-oracle"
