@@ -27,7 +27,7 @@
     method: GET
     validate_certs: no
     headers:
-        X-Consul-Token: "{{ vault.token }}"
+        X-Vault-Token: "{{ vault.token }}"
     return_content: yes
     body_format: json
   register: vault_leader_res
