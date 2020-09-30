@@ -1,13 +1,19 @@
 ---
 # tasks file for roles/splunk
 
-- name: Populate service facts
-  service_facts:
+- name: Check splunkd process using shell script
+  shell: |
+   # Check if splunk forwarder is running
+   # -x flag only match processes whose name (or command line if -f is
+   # specified) exactly match the pattern.
+   if pgrep -x "splunkd" > /dev/null
+   then
+       echo "Forwarder Running"
+   else
+       echo "Forwarder Stopped"
+   fi
+
+  register: splunk_forwarder_result
 
 - debug:
-    var: ansible_facts.services['splunk.service']
-
-- name: Splunk Forwarder Status
-  debug:
-    msg: Splunk Forwarder Up and Running
-  when: ansible_facts.services['splunk.service'].state == 'running'
+    var: splunk_forwarder_result
